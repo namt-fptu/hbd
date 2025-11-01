@@ -254,6 +254,87 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   `;
   document.head.appendChild(notifStyle);
+  
+  // Add hover sound effect (optional - can be enabled)
+  cake.addEventListener('mouseenter', function() {
+    cake.style.cursor = 'pointer';
+  });
+  
+  // Add visual indicator for microphone listening
+  let micIndicator = document.createElement('div');
+  micIndicator.className = 'mic-indicator';
+  micIndicator.innerHTML = '🎤 Đang lắng nghe...';
+  micIndicator.style.cssText = `
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    background: rgba(46, 204, 113, 0.9);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 14px;
+    z-index: 999;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: pulse 1.5s ease-in-out infinite;
+    display: none;
+  `;
+  document.body.appendChild(micIndicator);
+  
+  // Show mic indicator when microphone is active
+  if (analyser) {
+    micIndicator.style.display = 'block';
+  }
+  
+  // Add keyboard shortcuts hint
+  const keyboardHint = document.createElement('div');
+  keyboardHint.innerHTML = '💡 Tip: Nhấn Space để test thổi nến!';
+  keyboardHint.style.cssText = `
+    position: fixed;
+    bottom: 80px;
+    left: 20px;
+    background: rgba(155, 89, 182, 0.9);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 14px;
+    z-index: 999;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: slideInLeft 1s ease-out 2s both;
+  `;
+  document.body.appendChild(keyboardHint);
+  
+  // Hide hint after 5 seconds
+  setTimeout(() => {
+    keyboardHint.style.animation = 'slideOut 0.5s ease-out forwards';
+    keyboardHint.style.transform = 'translateX(-400px)';
+  }, 7000);
+  
+  // Add keyboard shortcut for testing (Space key simulates blowing)
+  document.addEventListener('keydown', function(e) {
+    if (e.code === 'Space' && candles.length > 0) {
+      e.preventDefault();
+      // Simulate blowing effect
+      candles.forEach((candle) => {
+        if (!candle.classList.contains("out") && Math.random() > 0.6) {
+          candle.classList.add("out");
+          createSmokeEffect(candle);
+        }
+      });
+      updateCandleCount();
+      
+      // Check if all blown out
+      if (candles.every((candle) => candle.classList.contains("out"))) {
+        setTimeout(function() {
+          triggerConfetti();
+          endlessConfetti();
+          showCelebrationMessage();
+          audio.play();
+        }, 200);
+      }
+    }
+  });
 });
 
 function triggerConfetti() {
